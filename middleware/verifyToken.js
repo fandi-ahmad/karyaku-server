@@ -90,7 +90,7 @@ const checkAuthInLogin = async (req, res, next) => {
           sameSite: 'none',
         })
   
-        res.redirect('/')
+        res.json({ status: 200, message: 'refresh token ready' })
       })
     }
   }

@@ -206,4 +206,22 @@ const logoutUser = async (req, res) => {
   }
 }
 
-module.exports = { registerUser, getUser, getAllUser, loginUser, getRefreshToken, logoutUser }
+const getUserLogin = async (req, res) => {
+  const refreshToken = req.cookies.refreshToken
+
+  try {
+    const user = await User.findAll({
+      attributes: ['email', 'username'],
+      where: {
+        refresh_token: refreshToken
+      }
+    })
+    return res.status(200).json({ status: 200, message: 'ok', data: user[0] })
+
+  } catch (error) {
+    res.status(500).json({ status: 500, message: 'Internal server error' });
+    console.log(error, '<-- error get user login');
+  }
+}
+
+module.exports = { registerUser, getUser, getAllUser, loginUser, getRefreshToken, logoutUser, getUserLogin }
