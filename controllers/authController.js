@@ -23,7 +23,7 @@ const registerUser = async (req, res) => {
       // check password minimal 8 chacarter, 1 uppercase, 1 lowercase, 1 number, and 1 symbol
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
       if (!passwordRegex.test(password)) {
-        return res.status(400).json({ message: 'Password harus minimal 8 karakter, memiliki setidaknya 1 huruf kecil, 1 huruf besar, 1 angka, dan 1 karakter simbol seperti @$!%*?&#' });
+        return res.status(400).json({ status: 400, message: 'Password harus minimal 8 karakter, memiliki setidaknya 1 huruf kecil, 1 huruf besar, 1 angka, dan 1 karakter simbol seperti @$!%*?&#' });
       } else {
         // generate account
         const salt = await genSalt()
@@ -211,7 +211,7 @@ const getUserLogin = async (req, res) => {
 
   try {
     const user = await User.findAll({
-      attributes: ['email', 'username'],
+      attributes: ['uuid', 'email', 'username'],
       where: {
         refresh_token: refreshToken
       }
@@ -224,4 +224,22 @@ const getUserLogin = async (req, res) => {
   }
 }
 
-module.exports = { registerUser, getUser, getAllUser, loginUser, getRefreshToken, logoutUser, getUserLogin }
+const updateUserProfile = async (req, res) => {
+  try {
+    const { username } = req.body
+    const refreshToken = req.cookies.refreshToken
+
+    const user = await User.update({ username: username }, {
+      where: {
+        refresh_token: refreshToken
+      }
+    })
+
+    res.status(200).json({ status: 200, message: 'ok' })
+  } catch (error) {
+    res.status(500).json({ status: 500, message: 'Internal server error' });
+    console.log(error, '<-- error get user login');
+  }
+}
+
+module.exports = { registerUser, getUser, getAllUser, loginUser, getRefreshToken, logoutUser, getUserLogin, updateUserProfile }
