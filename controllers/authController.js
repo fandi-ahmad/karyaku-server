@@ -1,4 +1,4 @@
-const { User } = require('../models')
+const { User, User_profile } = require('../models')
 const { v4: uuidv4 } = require('uuid')
 const { sign, verify } = require('jsonwebtoken')
 const { genSalt, hash, compare } = require('bcrypt')
@@ -8,6 +8,10 @@ const registerUser = async (req, res) => {
   try {
     const { email, password } = req.body
     const randomUUID = uuidv4();
+    const randomUUIDUserProfile = uuidv4();
+
+    console.log(randomUUID, '<-- uuid user');
+    console.log(randomUUIDUserProfile, '<-- uuid user profile');
 
     const user = await User.findAll({
       where: { email: email }
@@ -33,6 +37,11 @@ const registerUser = async (req, res) => {
           uuid: randomUUID,
           email: email,
           password: hashPassword
+        })
+
+        await User_profile.create({
+          uuid: randomUUIDUserProfile,
+          uuid_user: randomUUID
         })
   
         res.status(200).json({
