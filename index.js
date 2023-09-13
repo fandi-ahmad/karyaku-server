@@ -19,10 +19,10 @@ const corsOptions = {
 
 app.use(cors(corsOptions))
 app.use(cookieParser());
-app.use(express.json())
+// app.use(express.json())
 app.use(bodyParser.json());
 app.use('/images', express.static(path.join(__dirname, 'images')))
-app.use(multer({storage: fileStorage, fileFilter: filterFormat}).single('image'))
+app.use(multer({storage: fileStorage, fileFilter: filterFormat}).single('image_upload'))
 app.use(router)
 
 app.listen(port, () => {

@@ -27,12 +27,12 @@ const removeImage = (filePath) => {
   filePath = path.join(__dirname, '..', filePath)
 
   // remove file by path
-  fs.unlink(filePath, err => console.log(err))
+  fs.unlink(filePath, err => console.log(err, '<-- error remove image'))
 }
 
 const updateUserProfile = async (req, res) => {
   try {
-    const { uuid_user, username, fullname, category, profile_picture, address, work, link, biodata, tag } = req.body
+    const { uuid_user, username, fullname, category, address, work, link, biodata, tag } = req.body
 
     await User.update({ username: username }, {
       where: { uuid: uuid_user }
@@ -42,35 +42,31 @@ const updateUserProfile = async (req, res) => {
       where: { uuid_user: uuid_user }
     })
 
-    // const userProfileById = await User_profile.findByPk(1)
-
-    // console.log(userProfile, '<-- user profile by uuid');
-    // console.log(userProfileById, '<-- user profile by id');
-
-    await User_profile.update({
-      fullname: fullname,
-      category: category,
-      // profile_picture: profile_picture,
-      address: address,
-      work: work,
-      link: link,
-      biodata: biodata,
-      tag: tag
-    }, {
-      where: { uuid_user: uuid_user }
-    })
-
     if (req.file) {
-      const profile_picture = req.file.path
-      removeImage(userProfile.profile_picture)
-      await User_profile.update({
-        profile_picture: profile_picture
-      }, {
-        where: { uuid_user: uuid_user }
-      })
+      const image_upload = req.file.path
+      if (userProfile[0].profile_picture === '') {
+        userProfile[0].profile_picture = image_upload
+      } else {
+        removeImage(userProfile[0].profile_picture)
+        userProfile[0].profile_picture = image_upload
+      }
     }
 
-    res.status(200).json({ status: 200, message: 'update user profile successfully' })
+    userProfile[0].fullname = fullname
+    userProfile[0].category = category
+    userProfile[0].address = address
+    userProfile[0].work = work
+    userProfile[0].link = link
+    userProfile[0].biodata = biodata
+    userProfile[0].tag = tag
+    userProfile[0].save()
+   
+
+    res.status(200).json({ 
+      status: 200, 
+      message: 'update user profile successfully',
+      data: userProfile[0].fullname
+    })
 
   } catch (error) {
     res.status(500).json({ status: 500, message: 'Internal server error' });
