@@ -36,12 +36,20 @@ const registerUser = async (req, res) => {
         await User.create({
           uuid: randomUUID,
           email: email,
-          password: hashPassword
+          password: hashPassword,
+          username: ''
         })
 
         await User_profile.create({
           uuid: randomUUIDUserProfile,
-          uuid_user: randomUUID
+          uuid_user: randomUUID,
+          fullname: '',
+          categoty: '',
+          profile_picture: '',
+          address: '',
+          work: '',
+          link: '',
+          biodata: '',
         })
   
         res.status(200).json({
@@ -225,7 +233,21 @@ const getUserLogin = async (req, res) => {
         refresh_token: refreshToken
       }
     })
-    return res.status(200).json({ status: 200, message: 'ok', data: user[0] })
+    const userProfile = await User_profile.findAll({
+      attributes: ['profile_picture'],
+      where: {
+        uuid_user: user[0].uuid
+      }
+    })
+
+    const data = {
+      uuid: user[0].uuid,
+      email: user[0].email,
+      username: user[0].username,
+      profile_picture: userProfile[0].profile_picture
+    }
+
+    return res.status(200).json({ status: 200, message: 'ok', data: data })
 
   } catch (error) {
     res.status(500).json({ status: 500, message: 'Internal server error' });
