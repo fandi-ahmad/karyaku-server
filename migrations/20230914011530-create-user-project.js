@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('User_profiles', {
+    await queryInterface.createTable('User_projects', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -24,32 +24,26 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
       },
-      fullname: {
+      project_image: {
         type: Sequelize.STRING
       },
-      category: {
+      title: {
         type: Sequelize.STRING
       },
-      profile_picture: {
+      description: {
         type: Sequelize.STRING
-      },
-      address: {
-        type: Sequelize.STRING
-      },
-      work: {
-        type: Sequelize.STRING
-      },
-      link: {
-        type: Sequelize.STRING
-      },
-      biodata: {
-        type: Sequelize.TEXT
       },
       tag: {
         type: Sequelize.STRING
       },
-      generation: {
+      demo_link: {
         type: Sequelize.STRING
+      },
+      source_code: {
+        type: Sequelize.STRING
+      },
+      is_archive: {
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,
@@ -62,6 +56,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('User_profiles');
+    await queryInterface.dropTable('User_projects');
   }
 };

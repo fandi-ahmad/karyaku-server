@@ -10,9 +10,6 @@ const registerUser = async (req, res) => {
     const randomUUID = uuidv4();
     const randomUUIDUserProfile = uuidv4();
 
-    console.log(randomUUID, '<-- uuid user');
-    console.log(randomUUIDUserProfile, '<-- uuid user profile');
-
     const user = await User.findAll({
       where: { email: email }
     })
@@ -44,7 +41,7 @@ const registerUser = async (req, res) => {
           uuid: randomUUIDUserProfile,
           uuid_user: randomUUID,
           fullname: '',
-          categoty: '',
+          category: '',
           profile_picture: '',
           address: '',
           work: '',
