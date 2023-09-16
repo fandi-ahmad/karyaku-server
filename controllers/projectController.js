@@ -65,6 +65,7 @@ const getAllProjectList = async (req, res) => {
       FROM users
       JOIN user_profiles ON (users.uuid = user_profiles.uuid_user)
       JOIN user_projects ON (users.uuid = user_projects.uuid_user)
+      ORDER BY user_projects.createdAt DESC;
     `
 
     const dataProject = await sequelize.query(rawQuery)
