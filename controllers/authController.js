@@ -1,4 +1,4 @@
-const { User } = require('../models')
+const { User, User_profile } = require('../models')
 const { v4: uuidv4 } = require('uuid')
 const { sign, verify } = require('jsonwebtoken')
 const { genSalt, hash, compare } = require('bcrypt')
@@ -8,6 +8,7 @@ const registerUser = async (req, res) => {
   try {
     const { email, password } = req.body
     const randomUUID = uuidv4();
+    const randomUUIDUserProfile = uuidv4();
 
     const user = await User.findAll({
       where: { email: email }
@@ -23,7 +24,7 @@ const registerUser = async (req, res) => {
       // check password minimal 8 chacarter, 1 uppercase, 1 lowercase, 1 number, and 1 symbol
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
       if (!passwordRegex.test(password)) {
-        return res.status(400).json({ message: 'Password harus minimal 8 karakter, memiliki setidaknya 1 huruf kecil, 1 huruf besar, 1 angka, dan 1 karakter simbol seperti @$!%*?&#' });
+        return res.status(400).json({ status: 400, message: 'Password harus minimal 8 karakter, memiliki setidaknya 1 huruf kecil, 1 huruf besar, 1 angka, dan 1 karakter simbol seperti @$!%*?&#' });
       } else {
         // generate account
         const salt = await genSalt()
@@ -32,7 +33,20 @@ const registerUser = async (req, res) => {
         await User.create({
           uuid: randomUUID,
           email: email,
-          password: hashPassword
+          password: hashPassword,
+          username: ''
+        })
+
+        await User_profile.create({
+          uuid: randomUUIDUserProfile,
+          uuid_user: randomUUID,
+          fullname: '',
+          category: '',
+          profile_picture: '',
+          address: '',
+          work: '',
+          link: '',
+          biodata: '',
         })
   
         res.status(200).json({
@@ -211,12 +225,26 @@ const getUserLogin = async (req, res) => {
 
   try {
     const user = await User.findAll({
-      attributes: ['email', 'username'],
+      attributes: ['uuid', 'email', 'username'],
       where: {
         refresh_token: refreshToken
       }
     })
-    return res.status(200).json({ status: 200, message: 'ok', data: user[0] })
+    const userProfile = await User_profile.findAll({
+      attributes: ['profile_picture'],
+      where: {
+        uuid_user: user[0].uuid
+      }
+    })
+
+    const data = {
+      uuid: user[0].uuid,
+      email: user[0].email,
+      username: user[0].username,
+      profile_picture: userProfile[0].profile_picture
+    }
+
+    return res.status(200).json({ status: 200, message: 'ok', data: data })
 
   } catch (error) {
     res.status(500).json({ status: 500, message: 'Internal server error' });
@@ -224,4 +252,22 @@ const getUserLogin = async (req, res) => {
   }
 }
 
-module.exports = { registerUser, getUser, getAllUser, loginUser, getRefreshToken, logoutUser, getUserLogin }
+const updateUserProfile = async (req, res) => {
+  try {
+    const { username } = req.body
+    const refreshToken = req.cookies.refreshToken
+
+    const user = await User.update({ username: username }, {
+      where: {
+        refresh_token: refreshToken
+      }
+    })
+
+    res.status(200).json({ status: 200, message: 'ok' })
+  } catch (error) {
+    res.status(500).json({ status: 500, message: 'Internal server error' });
+    console.log(error, '<-- error get user login');
+  }
+}
+
+module.exports = { registerUser, getUser, getAllUser, loginUser, getRefreshToken, logoutUser, getUserLogin, updateUserProfile }

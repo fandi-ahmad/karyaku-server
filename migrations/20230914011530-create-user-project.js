@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('User_projects', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -10,24 +10,40 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       uuid: {
-        allowNull: false,
         unique: true,
-        type: Sequelize.STRING
-      },
-      username: {
-        unique: true,
-        type: Sequelize.STRING
-      },
-      email: {
         allowNull: false,
         type: Sequelize.STRING
       },
-      password: {
+      uuid_user: {
+        type: Sequelize.STRING,
         allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'uuid'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT'
+      },
+      project_image: {
         type: Sequelize.STRING
       },
-      refresh_token: {
+      title: {
         type: Sequelize.STRING
+      },
+      description: {
+        type: Sequelize.STRING
+      },
+      tag: {
+        type: Sequelize.STRING
+      },
+      demo_link: {
+        type: Sequelize.STRING
+      },
+      source_code: {
+        type: Sequelize.STRING
+      },
+      is_archive: {
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,
@@ -40,6 +56,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('User_projects');
   }
 };
