@@ -123,6 +123,7 @@ const deleteProject = async (req, res) => {
       })
     }
 
+    removeImage(userProject[0].project_image)
     userProject[0].destroy()
     res.json({ status: 200, message: 'delete successfully' })
     

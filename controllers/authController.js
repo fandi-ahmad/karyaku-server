@@ -1,4 +1,4 @@
-const { User, User_profile } = require('../models')
+const { User, User_profile, Sequelize } = require('../models')
 const { v4: uuidv4 } = require('uuid')
 const { sign, verify } = require('jsonwebtoken')
 const { genSalt, hash, compare } = require('bcrypt')
@@ -102,14 +102,17 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body
     const user = await User.findAll({
       where: {
-        email: email,
+        [Sequelize.Op.or]: [
+          { email: email },
+          { username: email } // Mencari berdasarkan username jika email tidak ditemukan
+        ]
       }
     })
 
     if (!user[0]) {
       return res.status(404).json({
         status: 404,
-        message: 'email not found'
+        message: 'email or username not found'
       });
     }
 
