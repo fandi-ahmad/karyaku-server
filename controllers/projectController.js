@@ -61,7 +61,7 @@ const getAllProjectList = async (req, res) => {
       SELECT 
         user_projects.id, user_projects.uuid, users.username, user_profiles.profile_picture,
         user_projects.project_image, user_projects.title, user_projects.description, 
-        user_projects.demo_link, user_projects.source_code
+        user_projects.demo_link, user_projects.source_code, user_projects.createdAt
       FROM users
       JOIN user_profiles ON (users.uuid = user_profiles.uuid_user)
       JOIN user_projects ON (users.uuid = user_projects.uuid_user)
