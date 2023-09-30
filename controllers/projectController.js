@@ -61,7 +61,7 @@ const getAllProjectList = async (req, res) => {
       SELECT 
         user_projects.id, user_projects.uuid, users.username, user_profiles.profile_picture,
         user_projects.project_image, user_projects.title, user_projects.description, 
-        user_projects.demo_link, user_projects.source_code
+        user_projects.demo_link, user_projects.source_code, user_projects.createdAt
       FROM users
       JOIN user_profiles ON (users.uuid = user_profiles.uuid_user)
       JOIN user_projects ON (users.uuid = user_projects.uuid_user)
@@ -123,6 +123,7 @@ const deleteProject = async (req, res) => {
       })
     }
 
+    removeImage(userProject[0].project_image)
     userProject[0].destroy()
     res.json({ status: 200, message: 'delete successfully' })
     
@@ -132,5 +133,32 @@ const deleteProject = async (req, res) => {
   }
 }
 
+const getUserDataByUsername = async (req, res) => {
+  try {
+    const { username } = req.params
 
-module.exports = { createProject, getProjectListByUser, getAllProjectList, updateProject, deleteProject }
+    const rawQuery = /*sql*/`
+      SELECT 
+        user_projects.id, user_projects.uuid, users.username, user_profiles.profile_picture,
+        user_projects.project_image, user_projects.title, user_projects.description, 
+        user_projects.demo_link, user_projects.source_code, user_projects.createdAt
+      FROM users
+      JOIN user_profiles ON (users.uuid = user_profiles.uuid_user)
+      JOIN user_projects ON (users.uuid = user_projects.uuid_user)
+      WHERE users.username = :username 
+      ORDER BY user_projects.createdAt DESC;
+    `
+
+    const dataProject = await sequelize.query(rawQuery,  {
+      replacements: { username }, // Mengirimkan nilai placeholder username
+      type: sequelize.QueryTypes.SELECT,
+    })
+    res.status(200).json({ status: 200, message: 'ok', data: dataProject[0] })
+  } catch (error) {
+    res.status(500).json({ status: 500, message: 'Internal server error' });
+    console.log(error, '<-- error get user data by username');
+  }
+}
+
+
+module.exports = { createProject, getProjectListByUser, getAllProjectList, updateProject, deleteProject, getUserDataByUsername }
