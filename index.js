@@ -1,6 +1,5 @@
 const express = require('express')
 const app = express()
-const port = 8000
 const router = require('./routes/router')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
@@ -12,6 +11,7 @@ const { fileStorage, filterFormat } = require('./middleware/filterImage')
 
 
 config()
+const port = process.env.KARYAKU_PORT_SERVER || 8000
 const corsOptions = {
   origin: process.env.KARYAKU_FRONTEND_CORS,
   credentials: true, 
