@@ -19,9 +19,9 @@ const addAuthorization = async (req, res, next) => {
 
   // Jika accessToken tidak ada
   if (!accessToken) {
-    console.log('access token tidak ada');
     getRefreshToken
-    if(!refreshToken) return res.sendStatus(401)
+    // if(!refreshToken) return res.sendStatus(401)
+    if(!refreshToken) return res.status(200).json({ status: 401, message: 'Unauthorized' })
     // if(!refreshToken) return res.redirect('/login')
     const user = await User.findAll({
       where: {

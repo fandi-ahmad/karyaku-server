@@ -22,6 +22,30 @@ const getUserProfileByUuid = async (req, res) => {
   }
 }
 
+const getUserProfileByUsername = async (req, res) => {
+  try {
+    const { username } = req.params
+
+    const user = await User.findAll({
+      where: { username: username }
+    })
+
+    if (user[0]) {
+      const userProfile = await User_profile.findAll({
+        where: { uuid_user: user[0].dataValues.uuid }
+      })
+
+      res.status(200).json({ status: 200, message: 'ok', data: userProfile[0] })
+    } else {
+      res.status(404).json({ status: 404, message: 'username is not found' })
+    }
+
+  } catch (error) {
+    res.status(500).json({ status: 500, message: 'Internal server error' });
+    console.log(error, '<-- error get user profile by username');
+  }
+}
+
 const removeImage = (filePath) => {
   // get location image
   filePath = path.join(__dirname, '..', filePath)
@@ -74,4 +98,4 @@ const updateUserProfile = async (req, res) => {
   }
 }
 
-module.exports = { getUserProfileByUuid, updateUserProfile }
+module.exports = { getUserProfileByUuid, updateUserProfile, getUserProfileByUsername }
