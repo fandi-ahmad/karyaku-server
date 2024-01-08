@@ -58,6 +58,19 @@ const updateUserProfile = async (req, res) => {
   try {
     const { uuid_user, username, fullname, category, address, work, link, biodata, tag } = req.body
 
+    const userByUsername = await User.findAll({
+      where: {
+        username: username,
+        uuid: {
+          [Op.not]: uuid_user
+        }
+      }
+    });
+
+    if (userByUsername.length > 0) {
+      return res.status(400).json({ status: 400, message: 'username not available' });
+    }
+
     await User.update({ username: username }, {
       where: { uuid: uuid_user }
     })
@@ -88,8 +101,7 @@ const updateUserProfile = async (req, res) => {
 
     res.status(200).json({ 
       status: 200, 
-      message: 'update user profile successfully',
-      data: userProfile[0].fullname
+      message: 'update user profile successfully'
     })
 
   } catch (error) {
