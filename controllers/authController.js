@@ -123,11 +123,11 @@ const loginUser = async (req, res) => {
     const userId = user[0].id
     const userEmail = user[0].email
 
-    const accessToken = sign({userId, userEmail}, process.env.KARYAKU_ACCESS_TOKEN, {
+    const accessToken = sign({userId, userEmail}, process.env.SOCIALKITA_ACCESS_TOKEN, {
       expiresIn: '30s'
     })
 
-    const refreshToken = sign({userId, userEmail}, process.env.KARYAKU_REFRESH_TOKEN, {
+    const refreshToken = sign({userId, userEmail}, process.env.SOCIALKITA_REFRESH_TOKEN, {
       expiresIn: '1d'
     })
 
@@ -174,11 +174,11 @@ const getRefreshToken = async (req, res) => {
       }
     })
     if(!user[0]) return res.sendStatus(403)
-    verify(refreshToken, process.env.KARYAKU_REFRESH_TOKEN, (err, decoded) => {
+    verify(refreshToken, process.env.SOCIALKITA_REFRESH_TOKEN, (err, decoded) => {
       if(err) return res.sendStatus(403)
       const userId = user[0].id
       const userEmail = user[0].email
-      const accessToken = sign({userId, userEmail}, process.env.KARYAKU_ACCESS_TOKEN, {
+      const accessToken = sign({userId, userEmail}, process.env.SOCIALKITA_ACCESS_TOKEN, {
         expiresIn: '30s'
       })
 
