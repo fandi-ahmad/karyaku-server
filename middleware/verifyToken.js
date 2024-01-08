@@ -19,9 +19,9 @@ const addAuthorization = async (req, res, next) => {
 
   // Jika accessToken tidak ada
   if (!accessToken) {
-    console.log('access token tidak ada');
     getRefreshToken
-    if(!refreshToken) return res.sendStatus(401)
+    // if(!refreshToken) return res.sendStatus(401)
+    if(!refreshToken) return res.status(200).json({ status: 401, message: 'Unauthorized' })
     // if(!refreshToken) return res.redirect('/login')
     const user = await User.findAll({
       where: {
@@ -30,12 +30,12 @@ const addAuthorization = async (req, res, next) => {
     })
     if(!user[0]) return res.sendStatus(403)
     // if(!user[0]) return res.redirect('/login')
-    verify(refreshToken, process.env.KARYAKU_REFRESH_TOKEN, (err, decoded) => {
+    verify(refreshToken, process.env.SOCIALKITA_REFRESH_TOKEN, (err, decoded) => {
       if(err) return res.sendStatus(403)
       // if(err) return res.redirect('/login')
       const userId = user[0].id
       const userEmail = user[0].email
-      const accessToken = sign({userId, userEmail}, process.env.KARYAKU_ACCESS_TOKEN, {
+      const accessToken = sign({userId, userEmail}, process.env.SOCIALKITA_ACCESS_TOKEN, {
         expiresIn: '30s'
       })
 
@@ -76,10 +76,10 @@ const checkAuthInLogin = async (req, res, next) => {
 
     // if user ready, generate access token and redirect to / (can't access /login)
     if (user[0]) {
-      verify(refreshToken, process.env.KARYAKU_REFRESH_TOKEN, (err, decoded) => {
+      verify(refreshToken, process.env.SOCIALKITA_REFRESH_TOKEN, (err, decoded) => {
         const userId = user[0].id
         const userEmail = user[0].email
-        const accessToken = sign({userId, userEmail}, process.env.KARYAKU_ACCESS_TOKEN, {
+        const accessToken = sign({userId, userEmail}, process.env.SOCIALKITA_ACCESS_TOKEN, {
           expiresIn: '30s'
         })
   

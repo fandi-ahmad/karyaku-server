@@ -1,4 +1,4 @@
-const { User_project, sequelize } = require('../models')
+const { User_project, sequelize, User_profile, User } = require('../models')
 const { v4: uuidv4 } = require('uuid')
 const path = require('path')
 const fs = require('fs')
@@ -137,23 +137,68 @@ const getUserDataByUsername = async (req, res) => {
   try {
     const { username } = req.params
 
-    const rawQuery = /*sql*/`
-      SELECT 
-        user_projects.id, user_projects.uuid, users.username, user_profiles.profile_picture,
-        user_projects.project_image, user_projects.title, user_projects.description, 
-        user_projects.demo_link, user_projects.source_code, user_projects.createdAt
-      FROM users
-      JOIN user_profiles ON (users.uuid = user_profiles.uuid_user)
-      JOIN user_projects ON (users.uuid = user_projects.uuid_user)
-      WHERE users.username = :username 
-      ORDER BY user_projects.createdAt DESC;
-    `
-
-    const dataProject = await sequelize.query(rawQuery,  {
-      replacements: { username }, // Mengirimkan nilai placeholder username
-      type: sequelize.QueryTypes.SELECT,
+    const dataUser = await User.findAll({
+      where: { username: username }
     })
-    res.status(200).json({ status: 200, message: 'ok', data: dataProject[0] })
+
+    if (dataUser[0]) {
+      const uuid_user = dataUser[0].dataValues.uuid
+
+      const dataUserProfile = await User_profile.findAll({
+        where: { uuid_user: uuid_user }
+      })
+  
+      const dataUserProject = await User_project.findAll({
+        where: { uuid_user: uuid_user }
+      })
+
+      const user = dataUserProfile[0].dataValues
+
+      const responseData = {
+        status: 200,
+        message: 'ok',
+        data: {
+          uuid_user: user.uuid_user,
+          username: dataUser[0].dataValues.username,
+          fullname: user.fullname,
+          category: user.category,
+          profile_picture: user.profile_picture,
+          address: user.address,
+          work: user.work,
+          link: user.link,
+          biodata: user.biodata,
+          tag: user.biodata,
+          generation: user.generation,
+          projects: dataUserProject
+        }
+      };
+      
+      res.status(200).json(responseData);
+
+    } else {
+      res.status(404).json({ status: 404, message: 'data not found' })
+    }
+
+   
+
+    // const rawQuery = /*sql*/`
+    //   SELECT 
+    //     user_projects.id, user_projects.uuid, users.username, user_profiles.profile_picture,
+    //     user_projects.project_image, user_projects.title, user_projects.description, 
+    //     user_projects.demo_link, user_projects.source_code, user_projects.createdAt
+    //   FROM users
+    //   JOIN user_profiles ON (users.uuid = user_profiles.uuid_user)
+    //   JOIN user_projects ON (users.uuid = user_projects.uuid_user)
+    //   WHERE users.username = :username 
+    //   ORDER BY user_projects.createdAt DESC;
+    // `
+
+    // const dataProject = await sequelize.query(rawQuery,  {
+    //   replacements: { username }, // Mengirimkan nilai placeholder username
+    //   type: sequelize.QueryTypes.SELECT,
+    // })
+
+    
   } catch (error) {
     res.status(500).json({ status: 500, message: 'Internal server error' });
     console.log(error, '<-- error get user data by username');
